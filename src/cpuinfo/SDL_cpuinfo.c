@@ -568,6 +568,11 @@ SDL_GetCPUCount(void)
             SDL_CPUCount = (int)sysconf(_SC_NPROCESSORS_ONLN);
         }
 #endif
+#ifdef __sgi
+		if (SDL_CPUCount <= 0) {
+			SDL_CPUCount = (int) sysconf(_SC_NPROC_ONLN);
+		}
+#endif
 #ifdef HAVE_SYSCTLBYNAME
         if (SDL_CPUCount <= 0) {
             size_t size = sizeof(SDL_CPUCount);

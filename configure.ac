@@ -938,6 +938,30 @@ AS_HELP_STRING([--enable-alsa-shared], [dynamically load ALSA audio support [[de
     fi
 }
 
+dnl Check whether we want to use IRIX 6.5+ native audio or not
+CheckDMEDIA()
+{
+    if test x$enable_audio = xyes; then
+        AC_MSG_CHECKING(for dmedia audio support)
+        have_dmedia=no
+        AC_TRY_COMPILE([
+          #include <dmedia/audio.h>
+        ],[
+          ALport audio_port;
+        ],[
+        have_dmedia=yes
+        ])
+        AC_MSG_RESULT($have_dmedia)
+        # Set up files for the audio library
+        if test x$have_dmedia = xyes; then
+            AC_DEFINE(SDL_AUDIO_DRIVER_DMEDIA)
+            SOURCES="$SOURCES $srcdir/src/audio/dmedia/*.c"
+            EXTRA_LDFLAGS="$EXTRA_LDFLAGS -laudio"
+            have_audio=yes
+        fi
+    fi
+}
+
 dnl Find JACK Audio
 CheckJACK()
 {
@@ -2866,6 +2890,10 @@ AS_HELP_STRING([--enable-pthread-sem], [use pthread semaphores [[default=yes]]])
             pthread_cflags="-D_REENTRANT -D_THREAD_SAFE"
             pthread_lib="-pthread"
             ;;
+        *-*-irix*)
+			pthread_cflags="-D_SGI_MP_SOURCE"
+			pthread_lib="-pthread -lpthread"
+			;;
         *-*-netbsd*)
             pthread_cflags="-D_REENTRANT -D_THREAD_SAFE"
             pthread_lib="-lpthread"
@@ -3496,7 +3524,7 @@ have_locale=no
 
 dnl Set up the configuration based on the host platform!
 case "$host" in
-    *-*-linux*|*-*-uclinux*|*-*-gnu*|*-*-k*bsd*-gnu|*-*-bsdi*|*-*-freebsd*|*-*-dragonfly*|*-*-netbsd*|*-*-openbsd*|*-*-sysv5*|*-*-solaris*|*-*-hpux*|*-*-aix*|*-*-minix*|*-*-nto*)
+    *-*-linux*|*-*-uclinux*|*-*-gnu*|*-*-k*bsd*-gnu|*-*-bsdi*|*-*-freebsd*|*-*-dragonfly*|*-*-netbsd*|*-*-openbsd*|*-*-sysv5*|*-*-solaris*|*-*-hpux*|*-*-aix*|*-*-minix*|*-*-nto*|*-*-irix*)
         case "$host" in
             *-*-android*)
                 # Android
@@ -3528,6 +3556,7 @@ case "$host" in
             *-*-solaris*)       ARCH=solaris ;;
             *-*-hpux*)          ARCH=hpux ;;
             *-*-aix*)           ARCH=aix ;;
+			*-*-irix*)			ARCH=irix ;;
             *-*-minix*)         ARCH=minix ;;
             *-*-nto*)           ARCH=nto
                 CheckQNXVideo
@@ -3542,6 +3571,7 @@ case "$host" in
         CheckARM
         CheckNEON
         CheckOSS
+		CheckDMEDIA
         CheckALSA
         CheckPulseAudio
         CheckJACK
@@ -3598,6 +3628,12 @@ case "$host" in
                 SUMMARY_audio="${SUMMARY_audio} sun"
                 have_audio=yes
             ;;
+			irix)
+                AC_DEFINE(SDL_AUDIO_DRIVER_DMEDIA, 1, [ ])
+                SOURCES="$SOURCES $srcdir/src/audio/dmedia/*.c"
+                SUMMARY_audio="${SUMMARY_audio} dmedia"
+                have_audio=yes
+			;;
             netbsd)  # Don't use this on OpenBSD, it's busted.
                 AC_DEFINE(SDL_AUDIO_DRIVER_NETBSD, 1, [ ])
                 SOURCES="$SOURCES $srcdir/src/audio/netbsd/*.c"

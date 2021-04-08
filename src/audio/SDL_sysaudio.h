@@ -194,6 +194,7 @@ extern AudioBootStrap ARTS_bootstrap;
 extern AudioBootStrap ESD_bootstrap;
 extern AudioBootStrap NACLAUDIO_bootstrap;
 extern AudioBootStrap NAS_bootstrap;
+extern AudioBootStrap DMEDIA_bootstrap;
 extern AudioBootStrap WASAPI_bootstrap;
 extern AudioBootStrap DSOUND_bootstrap;
 extern AudioBootStrap WINMM_bootstrap;

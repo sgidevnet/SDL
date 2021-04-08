@@ -31,6 +31,9 @@
 #include <X11/keysym.h>
 #include <locale.h>
 
+#ifdef __sgi
+#define SDL_X11_HAVE_UTF8 0
+#endif
 
 #define SDL_FORK_MESSAGEBOX 1
 #define SDL_SET_LOCALE      1
@@ -126,12 +129,14 @@ IntMax( int a, int b )
 static void
 GetTextWidthHeight( SDL_MessageBoxDataX11 *data, const char *str, int nbytes, int *pwidth, int *pheight )
 {
+#ifdef X_HAVE_UTF8_STRING
     if (SDL_X11_HAVE_UTF8) {
         XRectangle overall_ink, overall_logical;
         X11_Xutf8TextExtents(data->font_set, str, nbytes, &overall_ink, &overall_logical);
         *pwidth = overall_logical.width;
         *pheight = overall_logical.height;
     } else {
+#endif
         XCharStruct text_structure;
         int font_direction, font_ascent, font_descent;
         X11_XTextExtents( data->font_struct, str, nbytes,
@@ -139,7 +144,9 @@ GetTextWidthHeight( SDL_MessageBoxDataX11 *data, const char *str, int nbytes, in
                       &text_structure );
         *pwidth = text_structure.width;
         *pheight = text_structure.ascent + text_structure.descent;
+#ifdef X_HAVE_UTF8_STRING
     }
+#endif
 }
 
 /* Return index of button if position x,y is contained therein. */
@@ -189,6 +196,7 @@ X11_MessageBoxInit( SDL_MessageBoxDataX11 *data, const SDL_MessageBoxData * mess
         return SDL_SetError("Couldn't open X11 display");
     }
 
+#ifdef X_HAVE_UTF8_STRING
     if (SDL_X11_HAVE_UTF8) {
         char **missing = NULL;
         int num_missing = 0;
@@ -201,11 +209,14 @@ X11_MessageBoxInit( SDL_MessageBoxDataX11 *data, const SDL_MessageBoxData * mess
             return SDL_SetError("Couldn't load font %s", g_MessageBoxFont);
         }
     } else {
+#endif
         data->font_struct = X11_XLoadQueryFont( data->display, g_MessageBoxFontLatin1 );
         if ( data->font_struct == NULL ) {
             return SDL_SetError("Couldn't load font %s", g_MessageBoxFontLatin1);
         }
+#ifdef X_HAVE_UTF8_STRING
     }
+#endif
 
     if ( messageboxdata->colorScheme ) {
         colorhints = messageboxdata->colorScheme->colors;
@@ -569,15 +580,19 @@ X11_MessageBoxDraw( SDL_MessageBoxDataX11 *data, GC ctx )
     for ( i = 0; i < data->numlines; i++ ) {
         TextLineData *plinedata = &data->linedata[ i ];
 
+#ifdef X_HAVE_UTF8_STRING
         if (SDL_X11_HAVE_UTF8) {
             X11_Xutf8DrawString( display, window, data->font_set, ctx,
                              data->xtext, data->ytext + i * data->text_height,
                              plinedata->text, plinedata->length );
         } else {
+#endif
             X11_XDrawString( display, window, ctx,
                          data->xtext, data->ytext + i * data->text_height,
                          plinedata->text, plinedata->length );
+#ifdef X_HAVE_UTF8_STRING
         }
+#endif
     }
 
     for ( i = 0; i < data->numbuttons; i++ ) {
@@ -600,16 +615,20 @@ X11_MessageBoxDraw( SDL_MessageBoxDataX11 *data, GC ctx )
                         data->color[ SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED ] :
                         data->color[ SDL_MESSAGEBOX_COLOR_TEXT ] );
 
+#ifdef X_HAVE_UTF8_STRING
         if (SDL_X11_HAVE_UTF8) {
             X11_Xutf8DrawString( display, window, data->font_set, ctx,
                              buttondatax11->x + offset,
                              buttondatax11->y + offset,
                              buttondata->text, buttondatax11->length );
         } else {
+#endif
             X11_XDrawString( display, window, ctx,
                          buttondatax11->x + offset, buttondatax11->y + offset,
                          buttondata->text, buttondatax11->length );
+#ifdef X_HAVE_UTF8_STRING
         }
+#endif
     }
 
 #if SDL_VIDEO_DRIVER_X11_XDBE

@@ -1058,10 +1058,12 @@ SetDrawState(GL_RenderData *data, const SDL_RenderCommand *cmd, const GL_Shader 
             data->glDisable(GL_BLEND);
         } else {
             data->glEnable(GL_BLEND);
+#ifndef __sgi
             data->glBlendFuncSeparate(GetBlendFunc(SDL_GetBlendModeSrcColorFactor(blend)),
                                       GetBlendFunc(SDL_GetBlendModeDstColorFactor(blend)),
                                       GetBlendFunc(SDL_GetBlendModeSrcAlphaFactor(blend)),
                                       GetBlendFunc(SDL_GetBlendModeDstAlphaFactor(blend)));
+#endif
             data->glBlendEquation(GetBlendEquation(SDL_GetBlendModeColorOperation(blend)));
         }
         data->drawstate.blend = blend;

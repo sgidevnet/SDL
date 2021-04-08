@@ -18363,6 +18363,46 @@ _ACEOF
     fi
 }
 
+CheckDMEDIA()
+{
+    if test x$enable_audio = xyes; then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for dmedia audio support" >&5
+$as_echo_n "checking for dmedia audio support... " >&6; }
+        have_dmedia=no
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+          #include <dmedia/audio.h>
+
+int
+main ()
+{
+
+          ALport audio_port;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+        have_dmedia=yes
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $have_dmedia" >&5
+$as_echo "$have_dmedia" >&6; }
+        # Set up files for the audio library
+        if test x$have_dmedia = xyes; then
+            $as_echo "#define SDL_AUDIO_DRIVER_DMEDIA 1" >>confdefs.h
+
+            SOURCES="$SOURCES $srcdir/src/audio/dmedia/*.c"
+            EXTRA_LDFLAGS="$EXTRA_LDFLAGS -laudio"
+            have_audio=yes
+        fi
+    fi
+}
+
 CheckJACK()
 {
     # Check whether --enable-jack was given.
@@ -20177,8 +20217,6 @@ ac_x_header_dirs='
 /usr/local/include/X11R6
 /usr/local/include/X11R5
 /usr/local/include/X11R4
-
-/opt/X11/include
 
 /usr/X386/include
 /usr/x386/include
@@ -23278,6 +23316,10 @@ fi
             pthread_cflags="-D_REENTRANT -D_THREAD_SAFE"
             pthread_lib="-pthread"
             ;;
+        *-*-irix*)
+			pthread_cflags="-D_SGI_MP_SOURCE"
+			pthread_lib="-pthread -lpthread"
+			;;
         *-*-netbsd*)
             pthread_cflags="-D_REENTRANT -D_THREAD_SAFE"
             pthread_lib="-lpthread"
@@ -24690,7 +24732,7 @@ CheckEventSignals
 have_locale=no
 
 case "$host" in
-    *-*-linux*|*-*-uclinux*|*-*-gnu*|*-*-k*bsd*-gnu|*-*-bsdi*|*-*-freebsd*|*-*-dragonfly*|*-*-netbsd*|*-*-openbsd*|*-*-sysv5*|*-*-solaris*|*-*-hpux*|*-*-aix*|*-*-minix*|*-*-nto*)
+    *-*-linux*|*-*-uclinux*|*-*-gnu*|*-*-k*bsd*-gnu|*-*-bsdi*|*-*-freebsd*|*-*-dragonfly*|*-*-netbsd*|*-*-openbsd*|*-*-sysv5*|*-*-solaris*|*-*-hpux*|*-*-aix*|*-*-minix*|*-*-nto*|*-*-irix*)
         case "$host" in
             *-*-android*)
                 # Android
@@ -24724,6 +24766,7 @@ $as_echo "#define SDL_VIDEO_DRIVER_ANDROID 1" >>confdefs.h
             *-*-solaris*)       ARCH=solaris ;;
             *-*-hpux*)          ARCH=hpux ;;
             *-*-aix*)           ARCH=aix ;;
+			*-*-irix*)			ARCH=irix ;;
             *-*-minix*)         ARCH=minix ;;
             *-*-nto*)           ARCH=nto
                 CheckQNXVideo
@@ -24738,6 +24781,7 @@ $as_echo "#define SDL_VIDEO_DRIVER_ANDROID 1" >>confdefs.h
         CheckARM
         CheckNEON
         CheckOSS
+		CheckDMEDIA
         CheckALSA
         CheckPulseAudio
         CheckJACK
@@ -24796,6 +24840,14 @@ $as_echo "#define SDL_AUDIO_DRIVER_SUNAUDIO 1" >>confdefs.h
                 SUMMARY_audio="${SUMMARY_audio} sun"
                 have_audio=yes
             ;;
+			irix)
+
+$as_echo "#define SDL_AUDIO_DRIVER_DMEDIA 1" >>confdefs.h
+
+                SOURCES="$SOURCES $srcdir/src/audio/dmedia/*.c"
+                SUMMARY_audio="${SUMMARY_audio} dmedia"
+                have_audio=yes
+			;;
             netbsd)  # Don't use this on OpenBSD, it's busted.
 
 $as_echo "#define SDL_AUDIO_DRIVER_NETBSD 1" >>confdefs.h

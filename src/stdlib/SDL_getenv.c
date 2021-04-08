@@ -88,7 +88,9 @@ SDL_setenv(const char *name, const char *value, int overwrite)
     
     if (getenv(name) != NULL) {
         if (overwrite) {
+#ifndef __sgi
             unsetenv(name);
+#endif
         } else {
             return 0;  /* leave the existing one there. */
         }

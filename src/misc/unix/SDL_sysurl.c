@@ -28,6 +28,13 @@
 #include <sys/wait.h>
 #include <errno.h>
 
+#ifdef __sgi
+int
+SDL_SYS_OpenURL(const char *url)
+{
+		return 0;
+}
+#else
 int
 SDL_SYS_OpenURL(const char *url)
 {
@@ -65,6 +72,7 @@ SDL_SYS_OpenURL(const char *url)
 
     return 0;
 }
+#endif
 
 /* vi: set ts=4 sw=4 expandtab: */
 

@@ -55,8 +55,10 @@
 
 /* Use CLOCK_MONOTONIC_RAW, if available, which is not subject to adjustment by NTP */
 #if HAVE_CLOCK_GETTIME
-#ifdef CLOCK_MONOTONIC_RAW
+#if defined(CLOCK_MONOTONIC_RAW)
 #define SDL_MONOTONIC_CLOCK CLOCK_MONOTONIC_RAW
+#elif defined(CLOCK_SGI_CYCLE)
+#define SDL_MONOTONIC_CLOCK CLOCK_SGI_CYCLE
 #else
 #define SDL_MONOTONIC_CLOCK CLOCK_MONOTONIC
 #endif
