@@ -952,13 +952,6 @@ CheckDMEDIA()
         have_dmedia=yes
         ])
         AC_MSG_RESULT($have_dmedia)
-        # Set up files for the audio library
-        if test x$have_dmedia = xyes; then
-            AC_DEFINE(SDL_AUDIO_DRIVER_DMEDIA)
-            SOURCES="$SOURCES $srcdir/src/audio/dmedia/*.c"
-            EXTRA_LDFLAGS="$EXTRA_LDFLAGS -laudio"
-            have_audio=yes
-        fi
     fi
 }
 
@@ -3627,13 +3620,14 @@ case "$host" in
                 SOURCES="$SOURCES $srcdir/src/audio/sun/*.c"
                 SUMMARY_audio="${SUMMARY_audio} sun"
                 have_audio=yes
-            ;;
-			irix)
+            	;;
+	    irix)
                 AC_DEFINE(SDL_AUDIO_DRIVER_DMEDIA, 1, [ ])
                 SOURCES="$SOURCES $srcdir/src/audio/dmedia/*.c"
                 SUMMARY_audio="${SUMMARY_audio} dmedia"
+		EXTRA_LDFLAGS="$EXTRA_LDFLAGS -laudio"
                 have_audio=yes
-			;;
+		;;
             netbsd)  # Don't use this on OpenBSD, it's busted.
                 AC_DEFINE(SDL_AUDIO_DRIVER_NETBSD, 1, [ ])
                 SOURCES="$SOURCES $srcdir/src/audio/netbsd/*.c"

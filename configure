@@ -18392,14 +18392,6 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: $have_dmedia" >&5
 $as_echo "$have_dmedia" >&6; }
-        # Set up files for the audio library
-        if test x$have_dmedia = xyes; then
-            $as_echo "#define SDL_AUDIO_DRIVER_DMEDIA 1" >>confdefs.h
-
-            SOURCES="$SOURCES $srcdir/src/audio/dmedia/*.c"
-            EXTRA_LDFLAGS="$EXTRA_LDFLAGS -laudio"
-            have_audio=yes
-        fi
     fi
 }
 
@@ -24839,15 +24831,16 @@ $as_echo "#define SDL_AUDIO_DRIVER_SUNAUDIO 1" >>confdefs.h
                 SOURCES="$SOURCES $srcdir/src/audio/sun/*.c"
                 SUMMARY_audio="${SUMMARY_audio} sun"
                 have_audio=yes
-            ;;
-			irix)
+            	;;
+	    irix)
 
 $as_echo "#define SDL_AUDIO_DRIVER_DMEDIA 1" >>confdefs.h
 
                 SOURCES="$SOURCES $srcdir/src/audio/dmedia/*.c"
                 SUMMARY_audio="${SUMMARY_audio} dmedia"
+		EXTRA_LDFLAGS="$EXTRA_LDFLAGS -laudio"
                 have_audio=yes
-			;;
+		;;
             netbsd)  # Don't use this on OpenBSD, it's busted.
 
 $as_echo "#define SDL_AUDIO_DRIVER_NETBSD 1" >>confdefs.h
