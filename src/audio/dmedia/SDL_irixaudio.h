@@ -40,7 +40,7 @@ struct SDL_PrivateAudioData {
 };
 
 /* Old variable names */
-#define audio_port		this->hidden->audio_port
-#define mixbuf			this->hidden->mixbuf
+#define audio_port		(this->hidden->audio_port)
+#define mixbuf			(this->hidden->mixbuf)
 
 #endif /* _SDL_lowaudio_h */
